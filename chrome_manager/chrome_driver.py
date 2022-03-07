@@ -23,7 +23,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
 
-WORK_DIR = dirname(dirname(dirname(__file__)))
+WORK_DIR = dirname(dirname(__file__))
 
 sys.path.insert(0, WORK_DIR)
 
