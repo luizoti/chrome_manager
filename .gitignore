@@ -5,3 +5,5 @@ env
 logfile.log
 informações
 camposelojas040222.docx
+chrome_persistence_config
+*.egg-info
