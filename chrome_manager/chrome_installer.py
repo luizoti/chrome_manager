@@ -9,12 +9,24 @@ from os.path import exists, dirname, basename, join
 
 import requests
 
-
 WORK_DIR = dirname(__file__)
 
 sys.path.insert(0, WORK_DIR)
 
-from lib.webdriver_manager.utils import get_browser_version_from_os, ChromeType
+from webdriver_manager.utils import get_browser_version_from_os, ChromeType
+
+
+class OSType():
+    """Return the os type."""
+    LINUX = "linux"
+    MAC = "mac"
+    WIN = "win"
+
+
+class ChromeArch():
+    """Return arch strings to format url."""
+    X32 = ("-arch_x86", "GoogleChromeEnterpriseBundle.zip")
+    X64 = ("x64-", "GoogleChromeEnterpriseBundle64.zip")
 
 
 class ChromeNeedUpdate():
