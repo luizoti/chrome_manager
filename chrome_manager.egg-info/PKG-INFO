@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: chrome-manager
-Version: 0.0.1
+Version: 0.0.14
 Summary: Library to auto install chrome for Selenium usage.
 Home-page: https://github.com/luizoti/webdriver_manager
 Author: Luiz Antonio Lazoti
