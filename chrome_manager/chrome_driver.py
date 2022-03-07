@@ -15,7 +15,8 @@ from selenium.common.exceptions import (
     InvalidSessionIdException,
     InvalidArgumentException,
     JavascriptException,
-    NoSuchElementException
+    NoSuchElementException,
+    NoAlertPresentException,
 )
 
 from selenium import webdriver
@@ -27,11 +28,12 @@ WORK_DIR = dirname(dirname(__file__))
 
 sys.path.insert(0, WORK_DIR)
 
-from .chrome_installer import ChromeArch, ChromeDownloader
+import chrome_manager.logger as LOG
+from chrome_manager.chrome_installer import ChromeDownloader
+
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
-import lib.logger as LOG
 LOG = logging.getLogger(__name__)
 
 class ChromeSeleniumDrive():
@@ -151,6 +153,19 @@ class ChromeSeleniumDrive():
 
         return self._driver
 
+
+    def wait_for_alert(self):
+        """Agarda um alert ser clicado."""
+        alert_presente = True
+        while True:
+            try:
+                self._driver.switch_to.alert
+                sleep(1 + rand_time())
+            except NoAlertPresentException:
+                alert_presente = False
+                break
+        return alert_presente
+
     def wait_for_selector(self, selector, wait_time=10, click=False):
         """Wait for CSS and Selector."""
         counter = 0
@@ -160,7 +175,7 @@ class ChromeSeleniumDrive():
                 if element:
                     if click:
                         element.click()
-                    return True
+                    return element
             except (
                 NoSuchElementException,
                 ElementNotInteractableException,
@@ -171,16 +186,42 @@ class ChromeSeleniumDrive():
             ):
                 pass
             counter += 1
-            sleep(0.5)
+            sleep(1 + rand_time())
+
+
+    def scrap_tab_two(self, url, wait_time=2):
+        page_html = None
+        if len(self._driver.window_handles) == 1:
+            self._driver.execute_script("window.open()")
+
+        sleep(wait_time + rand_time())
+        if len(self._driver.window_handles) == 2:
+            self._driver.switch_to.window(self._driver.window_handles[-1])
+            self._driver.get(url)
+            while self._driver.execute_script("return document.readyState;") not in ["interactive", "complete"]:
+                sleep(0.2)
+                print(self._driver.execute_script(
+                    "return document.readyState;"))
+                pass
+            else:
+                sleep(1)
+                page_html = self._driver.page_source
+                sleep(wait_time + rand_time())
+                self._driver.execute_script("window.close()")
+            if len(self._driver.window_handles) == 1:
+                self._driver.switch_to.window(self._driver.window_handles[-1])
+            return page_html
+        return None
 
 
 def rand_time():
     """Return a random float number."""
-    return random() * randrange(10)
+    return random() * randrange(2)
 
 
 if __name__ == "__main__":
-    MYDRIVER = ChromeSeleniumDrive(maximize=True)
-    driver = MYDRIVER.create_driver()
-    driver.get("https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html")
+    SET_DRIVER = ChromeSeleniumDrive(maximize=True)
+    DRIVER = SET_DRIVER.create_driver()
+    DRIVER.get(
+        "https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html")
     sleep(10)
