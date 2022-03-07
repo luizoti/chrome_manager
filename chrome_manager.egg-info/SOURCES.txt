@@ -1,7 +1,0 @@
-README.md
-setup.py
-chrome_manager.egg-info/PKG-INFO
-chrome_manager.egg-info/SOURCES.txt
-chrome_manager.egg-info/dependency_links.txt
-chrome_manager.egg-info/requires.txt
-chrome_manager.egg-info/top_level.txt
