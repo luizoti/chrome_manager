@@ -37,7 +37,7 @@ LOG = logging.getLogger(__name__)
 class ChromeSeleniumDrive():
     """Wraper Chrome selenium."""
 
-    def __init__(self, headless=False, maximize=False, width=1280, height=800) -> None:
+    def __init__(self, headless=False, maximize=False, width=1280, height=800, chrome_storage_path=None) -> None:
         super().__init__()
         self._driver = None
         self.headless = headless
@@ -45,7 +45,9 @@ class ChromeSeleniumDrive():
         ChromeDownloader().install()
         self.service = Service(ChromeDriverManager().install())
 
-        self.chrome_storage = join(WORK_DIR, "chrome_persistence_config")
+        if chrome_storage_path:
+            self.chrome_storage = join(
+                chrome_storage_path, "chrome_persistence_config")
         # https://peter.sh/experiments/chromium-command-line-switches/
         self.chrome_args = [
             # "--disable-notifications", # NÃO PASSA NAS PERMISSÔES
@@ -80,9 +82,11 @@ class ChromeSeleniumDrive():
             "--window-position=0,0",
             f"--window-size={width},{height}",
             f"--user-agent=Mozilla/5.0 (Windows NT 4.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{get_browser_version_from_os(ChromeType.GOOGLE)} Safari/537.36",
-            rf"--user-data-dir={self.chrome_storage}",
             rf"--profile-directory={basename(__file__)}",
         ]
+
+        if chrome_storage_path:
+            self.chrome_args.append(rf"--user-data-dir={self.chrome_storage}")
 
     def set_options(self, extensions=None):
         """Setup ChromeOptions."""
