@@ -37,6 +37,7 @@ class ChromeNeedUpdate():
         # self.installed_version = [98, 0, 4844]
         try:
             browser_version = get_browser_version_from_os(ChromeType.GOOGLE)
+            self.installed_version = [int(x) for x in browser_version.split(".")] if browser_version else [0] * 3
         except AttributeError:
             pass
 
@@ -56,14 +57,10 @@ class ChromeNeedUpdate():
     def check(self):
         """Check if chrome need be updated."""
         print(
-            "Versão instalada             :", "{}.{}.{}".format(
-                *self.installed_version if self.installed_version else ["0"] * 3
-            )
+            "Versão instalada             :", "{}.{}.{}".format(*self.installed_version)
         )
         print(
-            "Versão remota (para download):", "{}.{}.{}".format(
-                *self.remote_version_info()
-            )
+            "Versão remota (para download):", "{}.{}.{}".format(*self.remote_version_info())
         )
         if not self.installed_version:
             print("Parece que o Chrome não esta instalado!")
