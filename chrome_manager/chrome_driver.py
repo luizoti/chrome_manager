@@ -17,7 +17,9 @@ from selenium.common.exceptions import (
     JavascriptException,
     NoSuchElementException,
     NoAlertPresentException,
+    WebDriverException
 )
+from urllib3.exceptions import MaxRetryError, NewConnectionError
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -29,7 +31,6 @@ WORK_DIR = dirname(dirname(__file__))
 sys.path.insert(0, WORK_DIR)
 
 import chrome_manager.logger as LOG
-from chrome_manager.chrome_installer import ChromeDownloader
 
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
@@ -44,7 +45,6 @@ class ChromeSeleniumDrive():
         self._driver = None
         self.headless = headless
         self.maximize = maximize
-        ChromeDownloader().install()
         self.service = Service(ChromeDriverManager().install())
 
         if chrome_storage_path:
@@ -213,6 +213,17 @@ class ChromeSeleniumDrive():
             return page_html
         return None
 
+    def close(self):
+        try:
+            self._driver.close()
+        except (
+            ConnectionRefusedError,
+            MaxRetryError,
+            NewConnectionError,
+            InvalidSessionIdException,
+            WebDriverException
+        ):
+            pass
 
 def rand_time():
     """Return a random float number."""
