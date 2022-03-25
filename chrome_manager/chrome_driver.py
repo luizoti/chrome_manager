@@ -23,7 +23,8 @@ from urllib3.exceptions import MaxRetryError, NewConnectionError
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
+
+from chrome_manager.service import create_service
 
 
 WORK_DIR = dirname(dirname(__file__))
@@ -40,12 +41,12 @@ LOG = logging.getLogger(__name__)
 class ChromeSeleniumDrive():
     """Wraper Chrome selenium."""
 
-    def __init__(self, headless=False, maximize=False, width=1280, height=800, chrome_storage_path=None) -> None:
+    def __init__(self, service, headless=False, maximize=False, width=1280, height=700, chrome_storage_path=None, silent=False) -> None:
         super().__init__()
         self._driver = None
         self.headless = headless
         self.maximize = maximize
-        self.service = Service(ChromeDriverManager().install())
+        self.service = service
 
         if chrome_storage_path:
             self.chrome_storage = join(
