@@ -19,7 +19,10 @@ from selenium.common.exceptions import (
     NoAlertPresentException,
     WebDriverException
 )
+
+from selenium.webdriver.remote.remote_connection import LOGGER as SELENIUM_LOGGER
 from urllib3.exceptions import MaxRetryError, NewConnectionError
+
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -33,9 +36,9 @@ sys.path.insert(0, WORK_DIR)
 
 import chrome_manager.logger as LOG
 
-from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
+SELENIUM_LOGGER.setLevel(logging.WARNING)
 LOG = logging.getLogger(__name__)
 
 class ChromeSeleniumDrive():
@@ -43,6 +46,9 @@ class ChromeSeleniumDrive():
 
     def __init__(self, service, headless=False, maximize=False, width=1280, height=700, chrome_storage_path=None, silent=False) -> None:
         super().__init__()
+        # TODO: silent argumento temporario, não pode continuar assim
+        self.silent = silent
+
         self._driver = None
         self.headless = headless
         self.maximize = maximize
@@ -58,6 +64,9 @@ class ChromeSeleniumDrive():
             # "--disable-background-timer-throttling",
             # "--disable-backgrounding-occluded-windows",
             # "--disable-extensions",
+            "--no-proxy-server",
+            "--proxy-server='direct://'",
+            "--proxy-bypass-list=*",
             "--disable-popup-blocking",
             "--disable-accelerated-2d-canvas",
             "--disable-gpu",
@@ -104,7 +113,7 @@ class ChromeSeleniumDrive():
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('excludeSwitches', ['enable-logging'])
         options.add_experimental_option("useAutomationExtension", False)
-        options.add_experimental_option("detach", True)
+        # options.add_experimental_option("detach", True)
 
         if self.headless:
             self.maximize = False
@@ -116,25 +125,19 @@ class ChromeSeleniumDrive():
         if extensions:
             for ext in extensions:
                 options.add_extension(ext)
-        return options
-
-    def create_driver(self, options=None) -> webdriver.Chrome:
-        """Create a configured Chrome driver."""
-
-        if not options:
-            options = self.set_options()
 
         try:
             self._driver = webdriver.Chrome(
                 service=self.service,
                 options=options,
             )
-            LOG.info(
-                f"BROWSERVERSION: {self._driver.capabilities['browserVersion']}"
-            )
-            LOG.info(
-                f"CHROMEDRIVERVERSION: {self._driver.capabilities['chrome']['chromedriverVersion']}"
-            )
+            if self.silent:
+                LOG.info(
+                    f"BROWSERVERSION: {self._driver.capabilities['browserVersion']}"
+                )
+                LOG.info(
+                    f"CHROMEDRIVERVERSION: {self._driver.capabilities['chrome']['chromedriverVersion']}"
+                )
         except InvalidArgumentException:
             print("")
             print("Aparentemente uma outra instancia do Chromium esta aberta, feche-a.")
@@ -145,6 +148,14 @@ class ChromeSeleniumDrive():
         except KeyboardInterrupt:
             sys.exit(0)
 
+        return options
+
+    def create_driver(self, options=None) -> webdriver.Chrome:
+        """Create a configured Chrome driver."""
+
+        if not options:
+            options = self.set_options()
+
         if self.maximize:
             print()
             print()
@@ -154,23 +165,22 @@ class ChromeSeleniumDrive():
 
         return self._driver
 
-
-    def wait_for_alert(self):
+    def wait_for_alert(self, random=False):
         """Agarda um alert ser clicado."""
         alert_presente = True
         while True:
             try:
                 self._driver.switch_to.alert
-                sleep(1 + rand_time())
+                sleep(1 + rand_time() if random else 0)
             except NoAlertPresentException:
                 alert_presente = False
                 break
         return alert_presente
 
-    def wait_for_selector(self, selector, wait_time=10, click=False):
+    def wait_for_selector(self, selector, wait_time=10, random=False, click=False):
         """Wait for CSS and Selector."""
         counter = 0
-        while counter < wait_time:
+        while counter <= wait_time:
             try:
                 element = self._driver.find_element(By.CSS_SELECTOR, selector)
                 if element:
@@ -178,6 +188,7 @@ class ChromeSeleniumDrive():
                         element.click()
                     return element
             except (
+                WebDriverException,
                 NoSuchElementException,
                 ElementNotInteractableException,
                 ElementClickInterceptedException,
@@ -187,15 +198,25 @@ class ChromeSeleniumDrive():
             ):
                 pass
             counter += 1
-            sleep(1 + rand_time())
+            sleep(1 + rand_time() if random else 0)
 
+    def wait_page_load(self, wait_time=2):
+        """Wait page complete load."""
+        counter = 0
+        states = ["complete"]
+        while self._driver.execute_script("return document.readyState;") not in states:
+            if counter >= wait_time:
+                break
+            sleep(1)
+            counter += 1
+        return True
 
-    def scrap_tab_two(self, url, wait_time=2):
+    def scrap_tab_two(self, url, wait_time=2, random=False):
         page_html = None
         if len(self._driver.window_handles) == 1:
             self._driver.execute_script("window.open()")
 
-        sleep(wait_time + rand_time())
+        sleep(wait_time + rand_time() if random else 0)
         if len(self._driver.window_handles) == 2:
             self._driver.switch_to.window(self._driver.window_handles[-1])
             self._driver.get(url)
@@ -207,7 +228,7 @@ class ChromeSeleniumDrive():
             else:
                 sleep(1)
                 page_html = self._driver.page_source
-                sleep(wait_time + rand_time())
+                sleep(wait_time + rand_time() if random else 0)
                 self._driver.execute_script("window.close()")
             if len(self._driver.window_handles) == 1:
                 self._driver.switch_to.window(self._driver.window_handles[-1])
@@ -232,8 +253,11 @@ def rand_time():
 
 
 if __name__ == "__main__":
-    SET_DRIVER = ChromeSeleniumDrive(maximize=True)
+    SET_DRIVER = ChromeSeleniumDrive(service=create_service(),maximize=True, headless=False)
     DRIVER = SET_DRIVER.create_driver()
     DRIVER.get(
-        "https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html")
+        "https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html"
+    )
     sleep(10)
+    SET_DRIVER.close()
+    pass
