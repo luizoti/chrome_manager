@@ -28,7 +28,6 @@ from urllib3.exceptions import MaxRetryError, NewConnectionError
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-from chrome_manager.service import create_service
 
 
 WORK_DIR = dirname(dirname(__file__))
@@ -37,6 +36,7 @@ sys.path.insert(0, WORK_DIR)
 
 import chrome_manager.logger as LOG
 
+from chrome_manager.service import create_service
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
 SELENIUM_LOGGER.setLevel(logging.WARNING)
