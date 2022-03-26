@@ -2,6 +2,7 @@
 
 """Browser automation to login and store the qconcursos search with filters."""
 
+from sqlite3 import Time
 import sys
 import logging
 
@@ -213,26 +214,29 @@ class ChromeSeleniumDrive():
 
     def scrap_tab_two(self, url, wait_time=2, random=False):
         page_html = None
-        if len(self._driver.window_handles) == 1:
-            self._driver.execute_script("window.open()")
-
-        sleep(wait_time + rand_time() if random else 0)
-        if len(self._driver.window_handles) == 2:
-            self._driver.switch_to.window(self._driver.window_handles[-1])
-            self._driver.get(url)
-            while self._driver.execute_script("return document.readyState;") not in ["interactive", "complete"]:
-                sleep(0.2)
-                print(self._driver.execute_script(
-                    "return document.readyState;"))
-                pass
-            else:
-                sleep(1)
-                page_html = self._driver.page_source
-                sleep(wait_time + rand_time() if random else 0)
-                self._driver.execute_script("window.close()")
+        try:
             if len(self._driver.window_handles) == 1:
+                self._driver.execute_script("window.open()")
+
+            sleep(wait_time + rand_time() if random else 0)
+            if len(self._driver.window_handles) == 2:
                 self._driver.switch_to.window(self._driver.window_handles[-1])
-            return page_html
+                self._driver.get(url)
+                while self._driver.execute_script("return document.readyState;") not in ["interactive", "complete"]:
+                    sleep(0.2)
+                    print(self._driver.execute_script(
+                        "return document.readyState;"))
+                    pass
+                else:
+                    sleep(1)
+                    page_html = self._driver.page_source
+                    sleep(wait_time + rand_time() if random else 0)
+                    self._driver.execute_script("window.close()")
+                if len(self._driver.window_handles) == 1:
+                    self._driver.switch_to.window(self._driver.window_handles[-1])
+                return page_html
+        except (JavascriptException, TimeoutError):
+            pass
         return None
 
     def close(self):
