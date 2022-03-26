@@ -23,12 +23,12 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     # packages=setuptools.find_packages(exclude=['tests']),
     include_package_data=True,
-    version='0.0.24',
+    version='0.0.26',
     description=(
         'Library to auto install chrome for Selenium usage.'),
     author='Luiz Antonio Lazoti',
     author_email='luizlazoti@hotmail.com',
-    url='https://github.com/luizoti/webdriver_manager',
+    url='https://github.com/luizoti/chrome_manager.git',
     keywords=['testing', 'selenium', 'driver', 'test automation'],
     classifiers=[
         'License :: OSI Approved :: Apache Software License',
