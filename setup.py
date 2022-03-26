@@ -30,22 +30,6 @@ setuptools.setup(
     author_email='luizlazoti@hotmail.com',
     url='https://github.com/luizoti/chrome_manager.git',
     keywords=['testing', 'selenium', 'driver', 'test automation'],
-    classifiers=[
-        'License :: OSI Approved :: Apache Software License',
-        'Intended Audience :: Information Technology',
-        'Intended Audience :: Developers',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
-        'Topic :: Software Development :: '
-        'Libraries :: Python Modules',
-        'Operating System :: Microsoft :: Windows',
-        'Operating System :: POSIX',
-        'Operating System :: Unix',
-        'Operating System :: MacOS',
-    ],
     install_requires=[
         'requests',
         'webdriver-manager',
