@@ -2,7 +2,6 @@
 
 """Browser automation to login and store the qconcursos search with filters."""
 
-from sqlite3 import Time
 import sys
 import logging
 
@@ -24,22 +23,19 @@ from selenium.common.exceptions import (
 from selenium.webdriver.remote.remote_connection import LOGGER as SELENIUM_LOGGER
 from urllib3.exceptions import MaxRetryError, NewConnectionError
 
-
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
-
 
 WORK_DIR = dirname(dirname(__file__))
 
 sys.path.insert(0, WORK_DIR)
 
 import chrome_manager.logger as LOG
-
 from chrome_manager.service import create_service
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
-SELENIUM_LOGGER.setLevel(logging.WARNING)
+SELENIUM_LOGGER.setLevel(logging.disable())
+
 LOG = logging.getLogger(__name__)
 
 class ChromeSeleniumDrive():
@@ -61,10 +57,10 @@ class ChromeSeleniumDrive():
         # https://peter.sh/experiments/chromium-command-line-switches/
         self.chrome_args = [
             # "--disable-notifications", # NÃO PASSA NAS PERMISSÔES
-            # "--disable-renderer-backgrounding",
-            # "--disable-background-timer-throttling",
-            # "--disable-backgrounding-occluded-windows",
-            # "--disable-extensions",
+            "--disable-renderer-backgrounding",
+            "--disable-background-timer-throttling",
+            "--disable-backgrounding-occluded-windows",
+            "--disable-extensions",
             "--no-proxy-server",
             "--proxy-server='direct://'",
             "--proxy-bypass-list=*",
@@ -166,19 +162,19 @@ class ChromeSeleniumDrive():
 
         return self._driver
 
-    def wait_for_alert(self, random=False):
+    def wait_for_alert(self):
         """Agarda um alert ser clicado."""
         alert_presente = True
         while True:
             try:
                 self._driver.switch_to.alert
-                sleep(1 + rand_time() if random else 0)
+                sleep(1)
             except NoAlertPresentException:
                 alert_presente = False
                 break
         return alert_presente
 
-    def wait_for_selector(self, selector, wait_time=10, random=False, click=False):
+    def wait_for_selector(self, selector, wait_time=10, click=False):
         """Wait for CSS and Selector."""
         counter = 0
         while counter <= wait_time:
@@ -199,7 +195,7 @@ class ChromeSeleniumDrive():
             ):
                 pass
             counter += 1
-            sleep(1 + rand_time() if random else 0)
+            sleep(1)
 
     def wait_page_load(self, wait_time=2):
         """Wait page complete load."""
@@ -212,13 +208,13 @@ class ChromeSeleniumDrive():
             counter += 1
         return True
 
-    def scrap_tab_two(self, url, wait_time=2, random=False):
+    def scrap_tab_two(self, url, wait_time=2):
         page_html = None
         try:
             if len(self._driver.window_handles) == 1:
                 self._driver.execute_script("window.open()")
 
-            sleep(wait_time + rand_time() if random else 0)
+            sleep(wait_time)
             if len(self._driver.window_handles) == 2:
                 self._driver.switch_to.window(self._driver.window_handles[-1])
                 self._driver.get(url)
@@ -230,7 +226,7 @@ class ChromeSeleniumDrive():
                 else:
                     sleep(1)
                     page_html = self._driver.page_source
-                    sleep(wait_time + rand_time() if random else 0)
+                    sleep(wait_time)
                     self._driver.execute_script("window.close()")
                 if len(self._driver.window_handles) == 1:
                     self._driver.switch_to.window(self._driver.window_handles[-1])
