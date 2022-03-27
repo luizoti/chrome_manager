@@ -34,7 +34,7 @@ import chrome_manager.logger as LOG
 from chrome_manager.service import create_service
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
-SELENIUM_LOGGER.setLevel(logging.ERROR())
+SELENIUM_LOGGER.setLevel(logging.ERROR)
 
 LOG = logging.getLogger(__name__)
 
