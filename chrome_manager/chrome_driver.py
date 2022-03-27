@@ -220,9 +220,6 @@ class ChromeSeleniumDrive():
                 self._driver.get(url)
                 while self._driver.execute_script("return document.readyState;") not in ["complete"]:
                     sleep(0.2)
-                    print(self._driver.execute_script(
-                        "return document.readyState;"))
-                    pass
                 else:
                     sleep(1)
                     page_html = self._driver.page_source
