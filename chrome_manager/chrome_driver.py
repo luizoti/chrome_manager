@@ -215,13 +215,10 @@ class ChromeSeleniumDrive():
             if len(self._driver.window_handles) == 1:
                 self._driver.execute_script("window.open()")
 
-            sleep(wait_time)
-            while len(self._driver.window_handles) == 2:
-                if limit == 3:
-                    break
+            if len(self._driver.window_handles) == 2:
                 self._driver.switch_to.window(self._driver.window_handles[-1])
                 self._driver.get(url)
-                while self._driver.execute_script("return document.readyState;") not in ["interactive", "complete"]:
+                while self._driver.execute_script("return document.readyState;") not in ["complete"]:
                     sleep(0.2)
                     print(self._driver.execute_script(
                         "return document.readyState;"))
