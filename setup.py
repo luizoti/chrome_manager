@@ -11,7 +11,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     # packages=setuptools.find_packages(exclude=['tests']),
     include_package_data=True,
-    version='0.0.32',
+    version='0.0.33',
     description=(
         'Library to auto install chrome for Selenium usage.'),
     author='Luiz Antonio Lazoti',
