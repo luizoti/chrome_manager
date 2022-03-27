@@ -229,7 +229,7 @@ class ChromeSeleniumDrive():
                     self._driver.switch_to.window(self._driver.window_handles[-1])
                 limit += 1
                 return page_html
-        except (JavascriptException, TimeoutError):
+        except (JavascriptException, WebDriverException, TimeoutError):
             pass
         return None
 
