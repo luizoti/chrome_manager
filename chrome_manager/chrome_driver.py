@@ -34,7 +34,7 @@ import chrome_manager.logger as LOG
 from chrome_manager.service import create_service
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
-SELENIUM_LOGGER.setLevel(logging.disable())
+SELENIUM_LOGGER.setLevel(logging.ERROR())
 
 LOG = logging.getLogger(__name__)
 
@@ -210,12 +210,15 @@ class ChromeSeleniumDrive():
 
     def scrap_tab_two(self, url, wait_time=2):
         page_html = None
+        limit = 3
         try:
             if len(self._driver.window_handles) == 1:
                 self._driver.execute_script("window.open()")
 
             sleep(wait_time)
-            if len(self._driver.window_handles) == 2:
+            while len(self._driver.window_handles) == 2:
+                if limit == 3:
+                    break
                 self._driver.switch_to.window(self._driver.window_handles[-1])
                 self._driver.get(url)
                 while self._driver.execute_script("return document.readyState;") not in ["interactive", "complete"]:
@@ -230,6 +233,7 @@ class ChromeSeleniumDrive():
                     self._driver.execute_script("window.close()")
                 if len(self._driver.window_handles) == 1:
                     self._driver.switch_to.window(self._driver.window_handles[-1])
+                limit += 1
                 return page_html
         except (JavascriptException, TimeoutError):
             pass
