@@ -20,6 +20,6 @@ setuptools.setup(
     keywords=['testing', 'selenium', 'driver', 'test automation'],
     install_requires=[
         'requests',
-        'webdriver-manager',
-    ],
+        'webdriver_manager @ git+https://github.com/luizoti/webdriver_manager',
+  ],
 )
