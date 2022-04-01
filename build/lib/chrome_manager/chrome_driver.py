@@ -59,6 +59,8 @@ class ChromeSeleniumDrive():
                 chrome_storage_path, "chrome_persistence_config")
         # https://peter.sh/experiments/chromium-command-line-switches/
         self.chrome_args = [
+            # "--remote-debugging-port=9222",
+            "--no-sandbox",
             # "--disable-notifications", # NÃO PASSA NAS PERMISSÔES
             "--disable-renderer-backgrounding",
             "--disable-background-timer-throttling",
