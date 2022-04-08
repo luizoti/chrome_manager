@@ -212,16 +212,24 @@ class ChromeSeleniumDrive():
             counter += 1
             sleep(1)
 
-    def wait_for_selectors(self, selector, wait_time=10, click=False):
+    def wait_for_selectors(self, selector, wait_time=10, click=False, click_wait=1):
         """Wait for CSS and Selector."""
         counter = 0
-        while counter < wait_time:
+        elements = None
+        while not elements:
+            if counter >= wait_time:
+                return None
             try:
-                element = self._driver.find_elements(By.CSS_SELECTOR, selector)
-                if element:
-                    if click:
+                elements = self._driver.find_elements(By.CSS_SELECTOR, selector)
+
+                if click and elements:
+                    for element in elements:
                         element.click()
-                    return element
+                        sleep(click_wait)
+
+                if elements:
+                    return elements
+
             except (
                 WebDriverException,
                 NoSuchElementException,
