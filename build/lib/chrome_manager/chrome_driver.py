@@ -258,9 +258,10 @@ class ChromeSeleniumDrive():
             counter += 1
         return True
 
-    def scrap_tab_two(self, url, wait_time=2):
+    def scrap_tab_two(self, url, wait_time=10):
+        counter = 0
         page_html = None
-        self.wait_page_load(wait_time=5)
+        self.wait_page_load()
         try:
             if len(self._driver.window_handles) == 1:
                 self._driver.execute_script("window.open()")
@@ -268,18 +269,18 @@ class ChromeSeleniumDrive():
             if len(self._driver.window_handles) == 2:
                 self._driver.switch_to.window(self._driver.window_handles[-1])
                 self._driver.get(url)
-                load_counter = 0
-                while self._driver.execute_script("return document.readyState;") not in ["complete"]:
+
+                while self._driver.execute_script("return document.readyState;") == "complete":
                     sleep(1)
-                    if load_counter == 30:
+                    if counter >= 30:
                         self._driver.refresh()
-                    elif load_counter == 45:
+                    elif counter >= 45:
                         self._driver.execute_script("window.close()")
-                    load_counter += 1
+                        counter = 0
+                    counter += 1
                 else:
-                    sleep(1)
                     page_html = self._driver.page_source
-                    sleep(wait_time)
+                    sleep(1)
                     self._driver.execute_script("window.close()")
                 if len(self._driver.window_handles) == 1:
                     self._driver.switch_to.window(
