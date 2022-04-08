@@ -243,18 +243,19 @@ class ChromeSeleniumDrive():
             counter += 1
             sleep(1)
 
-    def wait_page_load(self, wait_time=2, verbose=True):
+    def wait_page_load(self, wait_time=10, verbose=True):
         """Wait page complete load."""
-        load_counter = 0
-        states = ["complete"]
-        while self._driver.execute_script("return document.readyState;") not in states:
-            if load_counter == wait_time:
-                break
+        counter = 0
+        while self._driver.execute_script("return document.readyState;") == "complete":
+            if counter >= wait_time:
+                return None
+
             if verbose:
                 print(self._driver.execute_script(
-                    "return document.readyState;"))
+                    "return document.readyState;"
+                ))
             sleep(1)
-            load_counter += 1
+            counter += 1
         return True
 
     def scrap_tab_two(self, url, wait_time=2):
