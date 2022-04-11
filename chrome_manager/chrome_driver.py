@@ -45,7 +45,6 @@ class ChromeSeleniumDrive():
 
     def __init__(self, service, headless=False, maximize=False, width=1280, height=700, chrome_storage_path=None, silent=False) -> None:
         super().__init__()
-        # TODO: silent argumento temporario, não pode continuar assim
         self.silent = silent
 
         self._driver = None
