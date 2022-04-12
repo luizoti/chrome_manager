@@ -45,7 +45,6 @@ class ChromeSeleniumDrive():
 
     def __init__(self, service, headless=False, maximize=False, width=1280, height=700, chrome_storage_path=None, silent=False) -> None:
         super().__init__()
-        # TODO: silent argumento temporario, não pode continuar assim
         self.silent = silent
 
         self._driver = None
@@ -58,8 +57,6 @@ class ChromeSeleniumDrive():
                 chrome_storage_path, "chrome_persistence_config")
         # https://peter.sh/experiments/chromium-command-line-switches/
         self.chrome_args = [
-            # "--remote-debugging-port=9222",
-            "--no-sandbox",
             # "--disable-notifications", # NÃO PASSA NAS PERMISSÔES
             "--disable-renderer-backgrounding",
             "--disable-background-timer-throttling",
@@ -185,18 +182,12 @@ class ChromeSeleniumDrive():
     def wait_for_selector(self, selector, wait_time=10, click=False):
         """Wait for CSS and Selector."""
         counter = 0
-        element = None
-        while not element:
-            if counter >= wait_time:
-                return None
+        while counter < wait_time:
             try:
-                element = self._driver.find_element(
-                    By.CSS_SELECTOR,
-                    selector
-                )
-                if click and element:
-                    element.click()
+                element = self._driver.find_element(By.CSS_SELECTOR, selector)
                 if element:
+                    if click:
+                        element.click()
                     return element
             except (
                 WebDriverException,
@@ -211,24 +202,16 @@ class ChromeSeleniumDrive():
             counter += 1
             sleep(1)
 
-    def wait_for_selectors(self, selector, wait_time=10, click=False, click_wait=1):
+    def wait_for_selectors(self, selector, wait_time=10, click=False):
         """Wait for CSS and Selector."""
         counter = 0
-        elements = None
-        while not elements:
-            if counter >= wait_time:
-                return None
+        while counter < wait_time:
             try:
-                elements = self._driver.find_elements(By.CSS_SELECTOR, selector)
-
-                if click and elements:
-                    for element in elements:
+                element = self._driver.find_elements(By.CSS_SELECTOR, selector)
+                if element:
+                    if click:
                         element.click()
-                        sleep(click_wait)
-
-                if elements:
-                    return elements
-
+                    return element
             except (
                 WebDriverException,
                 NoSuchElementException,
@@ -242,25 +225,23 @@ class ChromeSeleniumDrive():
             counter += 1
             sleep(1)
 
-    def wait_page_load(self, wait_time=10, verbose=True):
+    def wait_page_load(self, wait_time=2, verbose=True):
         """Wait page complete load."""
-        counter = 0
-        while self._driver.execute_script("return document.readyState;") == "complete":
-            if counter >= wait_time:
-                return None
-
+        load_counter = 0
+        states = ["complete"]
+        while self._driver.execute_script("return document.readyState;") not in states:
+            if load_counter == wait_time:
+                break
             if verbose:
                 print(self._driver.execute_script(
-                    "return document.readyState;"
-                ))
+                    "return document.readyState;"))
             sleep(1)
-            counter += 1
+            load_counter += 1
         return True
 
-    def scrap_tab_two(self, url, wait_time=10):
-        counter = 0
+    def scrap_tab_two(self, url, wait_time=2):
         page_html = None
-        self.wait_page_load()
+        self.wait_page_load(wait_time=5)
         try:
             if len(self._driver.window_handles) == 1:
                 self._driver.execute_script("window.open()")
@@ -268,18 +249,18 @@ class ChromeSeleniumDrive():
             if len(self._driver.window_handles) == 2:
                 self._driver.switch_to.window(self._driver.window_handles[-1])
                 self._driver.get(url)
-
-                while self._driver.execute_script("return document.readyState;") == "complete":
+                load_counter = 0
+                while self._driver.execute_script("return document.readyState;") not in ["complete"]:
                     sleep(1)
-                    if counter >= 30:
+                    if load_counter == 30:
                         self._driver.refresh()
-                    elif counter >= 45:
+                    elif load_counter == 45:
                         self._driver.execute_script("window.close()")
-                        counter = 0
-                    counter += 1
+                    load_counter += 1
                 else:
-                    page_html = self._driver.page_source
                     sleep(1)
+                    page_html = self._driver.page_source
+                    sleep(wait_time)
                     self._driver.execute_script("window.close()")
                 if len(self._driver.window_handles) == 1:
                     self._driver.switch_to.window(
