@@ -13,6 +13,7 @@ import platform
 import requests
 from urllib.parse import urlparse
 from os.path import join, dirname, basename
+from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
 
 ARCH = platform.architecture()
@@ -23,7 +24,7 @@ class ChromeExtensionDownloader():
     def __init__(self):
         self.ext_download_url = "https://clients2.google.com/service/update2/crx?response=redirect&prodversion={chrome_version}&acceptformat=crx2,crx3&x=id%3D{extension_id}%26uc&nacl_arch={arch}"
 
-    def download(self, chrome_store_url, user_agent_ver, dest_dir=None):
+    def download(self, chrome_store_url, user_agent_ver=get_browser_version_from_os(ChromeType.GOOGLE), dest_dir=None):
         """
             Download the given URL into given filename.
             :param chrome_store_url:
