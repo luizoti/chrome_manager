@@ -9,7 +9,6 @@ import logging
 from time import sleep
 from os.path import join, dirname, basename
 from random import random, randrange
-import pygame
 
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
