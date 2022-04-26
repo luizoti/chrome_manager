@@ -13,7 +13,7 @@ import platform
 
 import requests
 from urllib.parse import urlparse
-from os.path import join, dirname, basename
+from os.path import join, abspath, basename
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
 
@@ -102,7 +102,7 @@ class ChromeExtensionDownloader():
                         str_to_format = f"\rBaixando: {dest_file} {'█' * done}{'.' * (50 - done)} | {self.sizeof_fmt(downloaded)}/{self.sizeof_fmt(total)}"
                         print(str_to_format, end="\r")
                         if downloaded == total:
-                            return dest_file
+                            return abspath(dest_file)
                 except KeyboardInterrupt:
                     print("\nDonwload interrompido")
                     return False
