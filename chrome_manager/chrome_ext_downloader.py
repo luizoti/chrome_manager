@@ -19,6 +19,7 @@ from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
 ARCH = platform.architecture()
 
+
 class ChromeExtensionDownloader():
     """Class to download Chrome Extension by URL."""
 
@@ -39,10 +40,7 @@ class ChromeExtensionDownloader():
 
         extension_url = self.ext_download_url.format(
             chrome_version=user_agent_ver, extension_id=extension_id, arch=arch)
-        return extension_url, self.download_file(
-            extension_url,
-            file_name
-        )
+        return extension_url, abspath(self.download_file(extension_url, file_name))
 
     def parse_extension_url(self, chrome_store_url):
         """
@@ -107,7 +105,6 @@ class ChromeExtensionDownloader():
                     print("\nDonwload interrompido")
                     return False
                 print()
-
 
     def get_arch(self):
         """Return a compatible architecture to use in download url."""
