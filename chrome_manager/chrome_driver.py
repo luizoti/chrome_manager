@@ -32,8 +32,8 @@ WORK_DIR = dirname(dirname(__file__))
 
 sys.path.insert(0, WORK_DIR)
 
-from chrome_manager.service import create_service
 import chrome_manager.logger as LOG
+from chrome_manager.service import create_service
 
 SELENIUM_LOGGER.setLevel(logging.ERROR)
 
