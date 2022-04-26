@@ -8,6 +8,7 @@
 
 import re
 import sys
+import tempfile
 import platform
 
 import requests
@@ -24,7 +25,7 @@ class ChromeExtensionDownloader():
     def __init__(self):
         self.ext_download_url = "https://clients2.google.com/service/update2/crx?response=redirect&prodversion={chrome_version}&acceptformat=crx2,crx3&x=id%3D{extension_id}%26uc&nacl_arch={arch}"
 
-    def download(self, chrome_store_url, user_agent_ver=get_browser_version_from_os(ChromeType.GOOGLE), dest_dir=None):
+    def download(self, chrome_store_url, user_agent_ver=get_browser_version_from_os(ChromeType.GOOGLE)):
         """
             Download the given URL into given filename.
             :param chrome_store_url:
@@ -32,12 +33,16 @@ class ChromeExtensionDownloader():
             :return:
         """
         arch = self.get_arch()
-        extension_id, file_name = self.parse_extension_url(chrome_store_url=chrome_store_url)
-        chrome_version = self.get_chrome_version(user_agent_ver)
+        extension_id, file_name = self.parse_extension_url(
+            chrome_store_url=chrome_store_url)
+        # chrome_version = self.get_chrome_version(user_agent_ver)
 
-        extension_url = self.ext_download_url.format(chrome_version=chrome_version, extension_id=extension_id, arch=arch)
-        return extension_url, self.download_file(extension_url, dest_dir, file_name)
-
+        extension_url = self.ext_download_url.format(
+            chrome_version=user_agent_ver, extension_id=extension_id, arch=arch)
+        return extension_url, self.download_file(
+            extension_url,
+            file_name
+        )
 
     def parse_extension_url(self, chrome_store_url):
         """
@@ -69,17 +74,14 @@ class ChromeExtensionDownloader():
             num /= 1024.0
         return "%.1f%s%s" % (num, "Yi", suffix)
 
-    def download_file(self, extension_url, dest_dir=None, file_name=None):
+    def download_file(self, extension_url, file_name=None):
         """Download file with url."""
 
         if not file_name:
             # Maybe is possible to ge extension from requests, maybe is to work
             file_name = basename(extension_url)
 
-        if not dest_dir:
-            dest_dir = dirname(__file__)
-
-        dest_file = join(dest_dir, file_name + ".crx")
+        dest_file = join(tempfile.gettempdir(), file_name + ".crx")
 
         with open(dest_file, "wb") as binary_file:
             print()
@@ -117,10 +119,10 @@ class ChromeExtensionDownloader():
             print("Not inplemented")
             sys.exit(0)
 
-
     def get_chrome_version(self, chrome_version):
         """Extract get_chrome version from User Agent."""
-        from_user_agent = re.findall(r"Chrom(?:e|ium)\/(\d+)\.(\d+)\.(\d+)\.(\d+)", chrome_version)
+        from_user_agent = re.findall(
+            r"Chrom(?:e|ium)\/(\d+)\.(\d+)\.(\d+)\.(\d+)", chrome_version)
 
         if from_user_agent:
             return ".".join(from_user_agent[0])
@@ -128,9 +130,8 @@ class ChromeExtensionDownloader():
             return chrome_version
 
 
-
 if __name__ == '__main__':
     url = "https://chrome.google.com/webstore/detail/certisign-websigner/acfifjfajpekbmhmjppnmmjgmhjkildl"
     _user_agent_ver = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
     downloader = ChromeExtensionDownloader().download(url, _user_agent_ver)
-    print(downloader)
+    print(get_browser_version_from_os(ChromeType.GOOGLE))
