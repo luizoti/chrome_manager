@@ -59,16 +59,24 @@ class ChromeNeedUpdate():
 
     def check(self):
         """Check if chrome need be updated."""
+        print()
+        print("-" * 45)
         print(
-            "Versão instalada             :", "{}.{}.{}".format(*self.installed_version)
+            "Versão instalada             :", "{}.{}.{}".format(
+                *self.installed_version)
         )
         print(
-            "Versão remota (para download):", "{}.{}.{}".format(*self.remote_version_info())
+            "Versão remota (para download):", "{}.{}.{}".format(
+                *self.remote_version_info())
         )
+        print("-" * 45)
+
         if not self.installed_version:
+            print()
             print("Parece que o Chrome não esta instalado!")
             return True
         return any([k < y for k, y in zip(self.installed_version, self.remote_version_info())])
+
 
 class ChromeDownloader():
     """Chrome Downloader."""
