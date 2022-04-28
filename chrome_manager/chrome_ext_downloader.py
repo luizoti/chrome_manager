@@ -6,6 +6,7 @@
     Referred from http://chrome-extension-downloader.com/how-does-it-work.php
 """
 
+import os
 import re
 import sys
 import tempfile
@@ -13,7 +14,7 @@ import platform
 
 import requests
 from urllib.parse import urlparse
-from os.path import join, abspath, basename
+from os.path import join, basename, exists
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
 
@@ -40,7 +41,7 @@ class ChromeExtensionDownloader():
 
         extension_url = self.ext_download_url.format(
             chrome_version=user_agent_ver, extension_id=extension_id, arch=arch)
-        return extension_url, abspath(self.download_file(extension_url, file_name))
+        return extension_url, self.download_file(extension_url, file_name)
 
     def parse_extension_url(self, chrome_store_url):
         """
@@ -72,18 +73,24 @@ class ChromeExtensionDownloader():
             num /= 1024.0
         return "%.1f%s%s" % (num, "Yi", suffix)
 
-    def download_file(self, extension_url, file_name=None):
+    def download_file(self, download_url, dest_dir=None, file_name=None):
         """Download file with url."""
 
         if not file_name:
             # Maybe is possible to ge extension from requests, maybe is to work
-            file_name = basename(extension_url)
+            file_name = basename(download_url)
 
-        dest_file = join(tempfile.gettempdir(), file_name + ".crx")
+        if not dest_dir:
+            dest_dir = tempfile.gettempdir()
+
+        dest_file = join(dest_dir, file_name)
+        if exists(dest_file):
+            os.remove(path=dest_file)
+            print(f"Arquivo deletado: {dest_file}")
 
         with open(dest_file, "wb") as binary_file:
             print()
-            response = requests.get(extension_url, stream=True)
+            response = requests.get(download_url, stream=True)
             total = response.headers.get("content-length")
 
             if total is None:
@@ -100,7 +107,7 @@ class ChromeExtensionDownloader():
                         str_to_format = f"\rBaixando: {dest_file} {'█' * done}{'.' * (50 - done)} | {self.sizeof_fmt(downloaded)}/{self.sizeof_fmt(total)}"
                         print(str_to_format, end="\r")
                         if downloaded == total:
-                            return abspath(dest_file)
+                            return dest_file
                 except KeyboardInterrupt:
                     print("\nDonwload interrompido")
                     return False
@@ -131,4 +138,4 @@ if __name__ == '__main__':
     url = "https://chrome.google.com/webstore/detail/certisign-websigner/acfifjfajpekbmhmjppnmmjgmhjkildl"
     _user_agent_ver = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
     downloader = ChromeExtensionDownloader().download(url, _user_agent_ver)
-    print(get_browser_version_from_os(ChromeType.GOOGLE))
+    print(downloader)
