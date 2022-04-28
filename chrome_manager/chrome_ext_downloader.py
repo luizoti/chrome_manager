@@ -11,10 +11,11 @@ import re
 import sys
 import tempfile
 import platform
+from pathlib import Path
 
 import requests
 from urllib.parse import urlparse
-from os.path import join, basename, exists
+from os.path import basename, exists
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
 
 
@@ -27,7 +28,7 @@ class ChromeExtensionDownloader():
     def __init__(self):
         self.ext_download_url = "https://clients2.google.com/service/update2/crx?response=redirect&prodversion={chrome_version}&acceptformat=crx2,crx3&x=id%3D{extension_id}%26uc&nacl_arch={arch}"
 
-    def download(self, chrome_store_url, user_agent_ver=get_browser_version_from_os(ChromeType.GOOGLE)):
+    def download(self, chrome_store_url, version_string=get_browser_version_from_os(ChromeType.GOOGLE)):
         """
             Download the given URL into given filename.
             :param chrome_store_url:
@@ -36,12 +37,20 @@ class ChromeExtensionDownloader():
         """
         arch = self.get_arch()
         extension_id, file_name = self.parse_extension_url(
-            chrome_store_url=chrome_store_url)
+            chrome_store_url=chrome_store_url
+        )
         # chrome_version = self.get_chrome_version(user_agent_ver)
 
         extension_url = self.ext_download_url.format(
-            chrome_version=user_agent_ver, extension_id=extension_id, arch=arch)
-        return extension_url, self.download_file(extension_url, file_name)
+            chrome_version=version_string,
+            extension_id=extension_id,
+            arch=arch
+        )
+        return extension_url, self.download_file(
+            download_url=extension_url,
+            dest_dir=None,
+            file_name=file_name + ".crx"
+        )
 
     def parse_extension_url(self, chrome_store_url):
         """
@@ -83,7 +92,7 @@ class ChromeExtensionDownloader():
         if not dest_dir:
             dest_dir = tempfile.gettempdir()
 
-        dest_file = join(dest_dir, file_name)
+        dest_file = Path(dest_dir, file_name)
         if exists(dest_file):
             os.remove(path=dest_file)
             print(f"Arquivo deletado: {dest_file}")
@@ -136,6 +145,5 @@ class ChromeExtensionDownloader():
 
 if __name__ == '__main__':
     url = "https://chrome.google.com/webstore/detail/certisign-websigner/acfifjfajpekbmhmjppnmmjgmhjkildl"
-    _user_agent_ver = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
-    downloader = ChromeExtensionDownloader().download(url, _user_agent_ver)
+    downloader = ChromeExtensionDownloader().download(url)
     print(downloader)
