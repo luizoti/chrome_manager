@@ -61,7 +61,6 @@ class ChromeSeleniumDrive():
             "--disable-renderer-backgrounding",
             "--disable-background-timer-throttling",
             "--disable-backgrounding-occluded-windows",
-            "--disable-extensions",
             # "--no-proxy-server",
             # "--proxy-server='direct://'",
             # "--proxy-bypass-list=*",
@@ -127,6 +126,8 @@ class ChromeSeleniumDrive():
         if extensions:
             for ext in extensions:
                 options.add_extension(ext)
+        else:
+            self.chrome_args.append("--disable-extensions")
 
         try:
             self._driver = webdriver.Chrome(
