@@ -86,15 +86,23 @@ class ChromeDownloader():
 
     def install(self, dest_dir=None):
         """Install Chrome."""
+
         if not ChromeNeedUpdate().check():
+            print()
             print("Chrome já instalado e na ultima versão.")
             return
+
         print()
         print("Baixando a ultima versão do Chrome.")
+
         if not dest_dir:
             dest_dir = tempfile.gettempdir()
 
-        downloaded_file = self.download_file(self.download_url)
+        downloaded_file = self.download_file(
+            download_url=self.download_url,
+            dest_dir=dest_dir,
+            file_name="chromesetup.msi"
+        )
 
         subprocess.call(["msiexec.exe", "/i", downloaded_file, "/qb"])
         return True
