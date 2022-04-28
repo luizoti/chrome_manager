@@ -99,23 +99,24 @@ class ChromeDownloader():
         subprocess.call(["msiexec.exe", "/i", downloaded_file, "/qb"])
         return True
 
-    def download_file(self, extension_url, dest_dir=None, file_name=None):
+    def download_file(self, download_url, dest_dir=None, file_name=None):
         """Download file with url."""
 
         if not file_name:
             # Maybe is possible to ge extension from requests, maybe is to work
-            file_name = basename(extension_url)
+            file_name = basename(download_url)
 
         if not dest_dir:
             dest_dir = tempfile.gettempdir()
 
         dest_file = join(dest_dir, file_name)
         if exists(dest_file):
-            return dest_file
+            os.remove(path=dest_file)
+            print(f"Arquivo deletado: {dest_file}")
 
         with open(dest_file, "wb") as binary_file:
             print()
-            response = requests.get(extension_url, stream=True)
+            response = requests.get(download_url, stream=True)
             total = response.headers.get("content-length")
 
             if total is None:
