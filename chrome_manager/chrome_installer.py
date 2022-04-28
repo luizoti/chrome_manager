@@ -34,7 +34,6 @@ class ChromeNeedUpdate():
 
     def __init__(self) -> None:
         self.installed_version = None
-        # self.installed_version = [98, 0, 4844]
         try:
             browser_version = get_browser_version_from_os(ChromeType.GOOGLE)
             self.installed_version = [int(x) for x in browser_version.split(".")] if browser_version else [0] * 3
