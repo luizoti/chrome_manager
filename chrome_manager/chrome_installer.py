@@ -36,13 +36,17 @@ class ChromeNeedUpdate():
         self.installed_version = None
         try:
             browser_version = get_browser_version_from_os(ChromeType.GOOGLE)
-            self.installed_version = [int(x) for x in browser_version.split(".")] if browser_version else [0] * 3
+            self.installed_version = [
+                int(x) for x in browser_version.split(".")
+            ] if browser_version else [0] * 3
         except AttributeError:
             pass
 
     def remote_version_info(self):
         """Get the remote chrome version form Google download page."""
-        json_versions = requests.get("https://omahaproxy.appspot.com/json").json()
+        json_versions = requests.get(
+            "https://omahaproxy.appspot.com/json"
+        ).json()
         for item in json_versions:
             os_type = item['os']
             if os_type == "win64":
