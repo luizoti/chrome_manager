@@ -1,2 +1,2 @@
 selenium
-git+https://github.com/SergeyPirogov/webdriver_manager.git
+webdriver_manager
