@@ -7,7 +7,8 @@ import sys
 import logging
 
 from time import sleep
-from os.path import join, dirname, basename
+from os.path import join, dirname, basename, abspath
+
 from random import random, randrange
 
 from selenium.common.exceptions import (
