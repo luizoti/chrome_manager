@@ -53,8 +53,8 @@ class ChromeSeleniumDrive():
         self.service = service
 
         if chrome_storage_path:
-            self.chrome_storage = join(
-                chrome_storage_path, "chrome_persistence_config")
+            self.chrome_storage = abspath(join(
+                chrome_storage_path, ".storage"))
         # https://peter.sh/experiments/chromium-command-line-switches/
         self.chrome_args = [
             # "--disable-notifications", # NÃO PASSA NAS PERMISSÔES
