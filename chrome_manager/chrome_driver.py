@@ -11,12 +11,12 @@ from time import sleep
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     ElementNotInteractableException,
-    InvalidSessionIdException,
     InvalidArgumentException,
+    InvalidSessionIdException,
     JavascriptException,
-    NoSuchElementException,
     NoAlertPresentException,
-    WebDriverException
+    NoSuchElementException,
+    WebDriverException,
 )
 
 from webdriver_manager.utils import get_browser_version_from_os, ChromeType
@@ -124,8 +124,7 @@ class ChromeSeleniumDrive():
         options.add_experimental_option("useAutomationExtension", False)
         # options.add_experimental_option("detach", True)
         if proxy:
-            options.add_argument(
-                f"--proxy-server=https://{proxy}")
+            options.add_argument(f"--proxy-server=https://{proxy}")
 
         if self.headless:
             self.maximize = False
@@ -156,7 +155,8 @@ class ChromeSeleniumDrive():
             print("")
             print("Aparentemente uma outra instancia do Chromium esta aberta, feche-a.")
             LOG.fatal(
-                "Aparentemente uma outra instancia do Chromium esta aberta, feche-a.")
+                "Aparentemente uma outra instancia do Chromium esta aberta, feche-a."
+            )
             print("")
             sys.exit(0)
         except KeyboardInterrupt:
@@ -208,7 +208,7 @@ class ChromeSeleniumDrive():
                 ElementClickInterceptedException,
                 InvalidSessionIdException,
                 JavascriptException,
-                ElementNotInteractableException
+                ElementNotInteractableException,
             ):
                 pass
             counter += 1
@@ -231,7 +231,7 @@ class ChromeSeleniumDrive():
                 ElementClickInterceptedException,
                 InvalidSessionIdException,
                 JavascriptException,
-                ElementNotInteractableException
+                ElementNotInteractableException,
             ):
                 pass
             counter += 1
@@ -245,8 +245,7 @@ class ChromeSeleniumDrive():
             if load_counter == wait_time:
                 break
             if verbose:
-                print(self._driver.execute_script(
-                    "return document.readyState;"))
+                print(self._driver.execute_script("return document.readyState;"))
             sleep(1)
             load_counter += 1
         return True
@@ -262,7 +261,9 @@ class ChromeSeleniumDrive():
                 self._driver.switch_to.window(self._driver.window_handles[-1])
                 self._driver.get(url)
                 load_counter = 0
-                while self._driver.execute_script("return document.readyState;") not in ["complete"]:
+                while self._driver.execute_script(
+                    "return document.readyState;"
+                ) not in ["complete"]:
                     sleep(1)
                     if load_counter == 30:
                         self._driver.refresh()
@@ -275,8 +276,7 @@ class ChromeSeleniumDrive():
                     sleep(wait_time)
                     self._driver.execute_script("window.close()")
                 if len(self._driver.window_handles) == 1:
-                    self._driver.switch_to.window(
-                        self._driver.window_handles[-1])
+                    self._driver.switch_to.window(self._driver.window_handles[-1])
                 return page_html
         except (JavascriptException, TimeoutError):
             pass
@@ -292,7 +292,7 @@ class ChromeSeleniumDrive():
             MaxRetryError,
             NewConnectionError,
             InvalidSessionIdException,
-            WebDriverException
+            WebDriverException,
         ):
             pass
 
@@ -304,7 +304,8 @@ def rand_time():
 
 if __name__ == "__main__":
     SET_DRIVER = ChromeSeleniumDrive(
-        service=create_service(), maximize=True, headless=False)
+        service=create_service(), maximize=True, headless=False
+    )
     DRIVER = SET_DRIVER.create_driver()
     DRIVER.get(
         "https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html"
