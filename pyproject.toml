@@ -1,0 +1,24 @@
+[project]
+name = "chrome_manager"
+version = "0.0.34"
+authors = [
+  { name="Luiz Antonio Lazoti", email="luizlazoti@hotmail.com" },
+]
+
+description = "Module to auto install chrome for Selenium usage."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/luizoti/chrome_manager"
+"Bug Tracker" = "https://github.com/luizoti/chrome_manager/issues"
+
+[build-system]
+requires = ["selenium", "webdriver-manager"]
+build-backend = "chrome_manager.build"
