@@ -5,7 +5,7 @@
 import logging
 import os
 import sys
-from os.path import basename, dirname, expanduser, join
+from os.path import dirname, expanduser, join
 from random import random, randrange
 from time import sleep
 
