@@ -2,12 +2,14 @@
 
 """Browser automation to login and store the qconcursos search with filters."""
 
+import logging
 import os
 import sys
 from os.path import basename, dirname, expanduser, join
 from random import random, randrange
 from time import sleep
 
+from selenium import webdriver
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     ElementNotInteractableException,
@@ -18,13 +20,10 @@ from selenium.common.exceptions import (
     NoSuchElementException,
     WebDriverException,
 )
-
-from webdriver_manager.utils import get_browser_version_from_os, ChromeType
+from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.remote_connection import LOGGER as SELENIUM_LOGGER
 from urllib3.exceptions import MaxRetryError, NewConnectionError
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+from webdriver_manager.utils import ChromeType, get_browser_version_from_os
 
 WORK_DIR = dirname(dirname(__file__))
 
@@ -38,7 +37,7 @@ SELENIUM_LOGGER.setLevel(logging.ERROR)
 LOG = logging.getLogger(__name__)
 
 
-class ChromeSeleniumDrive():
+class ChromeSeleniumDrive:
     """Wraper Chrome selenium."""
 
     def __init__(
@@ -116,11 +115,9 @@ class ChromeSeleniumDrive():
         chrome_prefs = {}
         options.experimental_options["prefs"] = chrome_prefs
         chrome_prefs["profile.default_content_settings"] = {"images": 2}
-        chrome_prefs["profile.managed_default_content_settings"] = {
-            "images": 2}
-        options.add_experimental_option(
-            "excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option("excludeSwitches", ["enable-logging"])
         options.add_experimental_option("useAutomationExtension", False)
         # options.add_experimental_option("detach", True)
         if proxy:
