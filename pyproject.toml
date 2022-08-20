@@ -18,7 +18,3 @@ classifiers = [
 [project.urls]
 "Homepage" = "https://github.com/luizoti/chrome_manager"
 "Bug Tracker" = "https://github.com/luizoti/chrome_manager/issues"
-
-[build-system]
-requires = ["selenium", "webdriver-manager"]
-build-backend = "chrome_manager.build"
