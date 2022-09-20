@@ -176,17 +176,19 @@ class ChromeSeleniumDrive:
 
         return self._driver
 
-    def wait_for_alert(self):
-        """Agarda um alert ser clicado."""
-        alert_presente = True
+    def wait_for_alert(self, wait_time=10) -> None | bool:
+        """Aguarda um alert ser clicado."""
         while True:
             try:
-                self._driver.switch_to.alert
-                sleep(1)
+                alert = self._driver.switch_to.alert
+                LOG.info(f"Switch to Success! -> {alert}")
+                return True
             except NoAlertPresentException:
-                alert_presente = False
+                sleep(1)
+                wait_time -= 1
+            if wait_time <= 0:
                 break
-        return alert_presente
+        return False
 
     def wait_for_selector(self, selector, wait_time=10, click=False):
         """Wait for CSS and Selector."""
