@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-"""Browser automation to login and store the qconcursos search with filters."""
+"""A wharpper for chrome selenium."""
 
 import logging
-import os
 import sys
-from os.path import dirname, expanduser, join
+from os.path import expanduser, join, abspath, dirname
 from random import random, randrange
 from time import sleep
 
 from selenium import webdriver
+from selenium.webdriver.remote.webelement import WebElement
+
 from selenium.common.exceptions import (
     ElementClickInterceptedException,
     ElementNotInteractableException,
@@ -23,13 +24,10 @@ from selenium.common.exceptions import (
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.remote_connection import LOGGER as SELENIUM_LOGGER
 from urllib3.exceptions import MaxRetryError, NewConnectionError
-from webdriver_manager.utils import ChromeType, get_browser_version_from_os
+from webdriver_manager.core.utils import ChromeType, get_browser_version_from_os
 
-WORK_DIR = dirname(dirname(__file__))
+sys.path.append(abspath("."))
 
-sys.path.insert(0, WORK_DIR)
-
-import chrome_manager.logger as LOG
 from chrome_manager.service import create_service
 
 SELENIUM_LOGGER.setLevel(logging.ERROR)
@@ -38,7 +36,7 @@ LOG = logging.getLogger(__name__)
 
 
 class ChromeSeleniumDrive:
-    """Wraper Chrome selenium."""
+    """Wrapper Chrome Selenium."""
 
     def __init__(
         self,
@@ -61,7 +59,7 @@ class ChromeSeleniumDrive:
 
         # https://peter.sh/experiments/chromium-command-line-switches/
         self.chrome_args = [
-            # "--disable-notifications", # NÃO PASSA NAS PERMISSÔES
+            # "--disable-notifications", # NÃO PASSA NAS PERMISSÕES
             "--disable-renderer-backgrounding",
             "--disable-background-timer-throttling",
             "--disable-backgrounding-occluded-windows",
@@ -112,7 +110,7 @@ class ChromeSeleniumDrive:
         options.page_load_strategy = "eager"
 
         # https://tarunlalwani.com/post/selenium-disable-image-loading-different-browsers/
-        chrome_prefs = {}
+        chrome_prefs = dict()
         options.experimental_options["prefs"] = chrome_prefs
         chrome_prefs["profile.default_content_settings"] = {"images": 2}
         chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
@@ -135,18 +133,21 @@ class ChromeSeleniumDrive:
                 options.add_extension(ext)
         else:
             self.chrome_args.append("--disable-extensions")
+        return options
 
+    def create_driver(self, options=None) -> webdriver.Chrome:
+        """Create a configured Chrome driver."""
         try:
             self._driver = webdriver.Chrome(
                 service=self.service,
-                options=options,
+                options=options if options else self.set_options(),
             )
             if self.silent:
                 LOG.info(
-                    f"BROWSERVERSION: {self._driver.capabilities['browserVersion']}"
+                    f"BROWSER_VERSION: {self._driver.capabilities['browserVersion']}"
                 )
                 LOG.info(
-                    f"CHROMEDRIVERVERSION: {self._driver.capabilities['chrome']['chromedriverVersion']}"
+                    f"CHROME_DRIVER_VERSION: {self._driver.capabilities['chrome']['chromedriverVersion']}"
                 )
         except InvalidArgumentException:
             print("")
@@ -159,18 +160,10 @@ class ChromeSeleniumDrive:
         except KeyboardInterrupt:
             sys.exit(0)
 
-        return options
-
-    def create_driver(self, options=None) -> webdriver.Chrome:
-        """Create a configured Chrome driver."""
-
-        if not options:
-            options = self.set_options()
-
         if self.maximize:
             print()
             print()
-            print("Chrome iniciando Maximizado.")
+            LOG.info("Chrome iniciando Maximizado.")
             self._driver.maximize_window()
             # driver.minimize_window()
 
@@ -190,7 +183,7 @@ class ChromeSeleniumDrive:
                 break
         return False
 
-    def wait_for_selector(self, selector, wait_time=10, click=False):
+    def wait_for_selector(self, selector, wait_time=10, click=False) -> WebElement:
         """Wait for CSS and Selector."""
         counter = 0
         while counter < wait_time:
@@ -213,7 +206,7 @@ class ChromeSeleniumDrive:
             counter += 1
             sleep(1)
 
-    def wait_for_selectors(self, selector, wait_time=10, click=False):
+    def wait_for_selectors(self, selector, wait_time=10, click=False) -> WebElement:
         """Wait for CSS and Selector."""
         counter = 0
         while counter < wait_time:
@@ -236,7 +229,7 @@ class ChromeSeleniumDrive:
             counter += 1
             sleep(1)
 
-    def wait_page_load(self, wait_time=2, verbose=True):
+    def wait_page_load(self, wait_time=2, verbose=True) -> bool:
         """Wait page complete load."""
         load_counter = 0
         states = ["complete"]
@@ -249,7 +242,7 @@ class ChromeSeleniumDrive:
             load_counter += 1
         return True
 
-    def scrap_tab_two(self, url, wait_time=2):
+    def scrap_tab_two(self, url, wait_time=2) -> None | str:
         page_html = None
         self.wait_page_load(wait_time=5)
         try:
@@ -276,14 +269,16 @@ class ChromeSeleniumDrive:
                     self._driver.execute_script("window.close()")
                 if len(self._driver.window_handles) == 1:
                     self._driver.switch_to.window(self._driver.window_handles[-1])
-                return page_html
+                # return page_html
+            return page_html
         except (JavascriptException, TimeoutError):
             pass
         except WebDriverException:
             self._driver.switch_to.window(self._driver.window_handles[-1])
         return None
 
-    def close(self):
+    def close(self) -> None:
+        """Close driver."""
         try:
             self._driver.close()
         except (
@@ -303,12 +298,13 @@ def rand_time():
 
 if __name__ == "__main__":
     SET_DRIVER = ChromeSeleniumDrive(
-        service=create_service(), maximize=True, headless=False
+        service=create_service(), maximize=True, headless=True
     )
     DRIVER = SET_DRIVER.create_driver()
     DRIVER.get(
         "https://intoli.com/blog/not-possible-to-block-chrome-headless/chrome-headless-test.html"
     )
     sleep(10)
+    DRIVER.save_screenshot(join(dirname(abspath(".")), "teste.png"))
     SET_DRIVER.close()
     pass
