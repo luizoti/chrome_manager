@@ -203,7 +203,7 @@ class ChromeSeleniumDrive:
                 ElementNotInteractableException,
             ):
                 pass
-            counter += 1
+            counter += 0.1
             sleep(1)
 
     def wait_for_selectors(self, selector, wait_time=10, click=False) -> WebElement:
