@@ -13,7 +13,7 @@ WORK_DIR = dirname(__file__)
 
 sys.path.insert(0, WORK_DIR)
 
-from webdriver_manager.utils import get_browser_version_from_os, ChromeType
+from webdriver_manager.core.utils import get_browser_version_from_os, ChromeType
 
 
 class OSType():
