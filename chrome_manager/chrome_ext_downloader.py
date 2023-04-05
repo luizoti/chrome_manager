@@ -16,7 +16,7 @@ from pathlib import Path
 import requests
 from urllib.parse import urlparse
 from os.path import basename, exists
-from webdriver_manager.core.utils import get_browser_version_from_os, ChromeType
+from webdriver_manager.core.core.utils import get_browser_version_from_os, ChromeType
 
 
 ARCH = platform.architecture()
