@@ -13,4 +13,4 @@ from selenium.webdriver.chrome.service import Service
 
 def create_service():
     """Return a webdriver service."""
-    return Service(ChromeDriverManager().install())
+    return Service(ChromeDriverManager(version="114.0.5735.90").install())
